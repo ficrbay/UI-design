@@ -6,9 +6,8 @@ function change_text(id, text) {
     buttons.forEach(button => {
         button.remove();
     });
-    
-    element.innerHTML = text;
 }
+
 function add_ai(content) {
     counter += 1;
     let msg = document.createElement('div');
@@ -105,20 +104,26 @@ let current_node = root_node;
 
 async function use_current_node() {
     try {
-        // 等待润色文本返回
         const ai_text_enhanced = await enhanceText(current_node.ai_text);
         add_ai(ai_text_enhanced);
     } catch (error) {
         console.error("AI 文本润色失败", error);
-        add_ai(current_node.ai_text); // 失败时显示原始文本
+        add_ai(current_node.ai_text);
     }
 
-    let user_content = "";
-    for (let i = 0; i < current_node.choices.length; i++) {
-        user_content += await button(current_node.choices[i], i) + "<br>"; // 确保按钮文本正确解析
-    }
-    if (user_content.length > 0) {
-        add_user(user_content);
+    if (current_node.choices.length > 0) {
+        let user_content = "";
+        for (let i = 0; i < current_node.choices.length; i++) {
+            user_content += await button(current_node.choices[i], i) + "<br>";
+        }
+        
+        let button_container = document.createElement('div');
+        button_container.className = 'message user';
+        button_container.innerHTML = `
+            <div class="message-content" id="buttons-${counter}">${user_content}</div>
+            <img src="https://scp-wiki.wdfiles.com/local--files/scp-3021/b.png" alt="User Icon">
+        `;
+        document.querySelector('.container').appendChild(button_container);
     }
 }
 function choose(i) {
@@ -141,16 +146,27 @@ async function enhanceText(text) {
         });
 
         const data = await response.json();
-        return data.response; // 确保返回的是文本内容，而不是 Promise
+        return data.response; 
     } catch (error) {
         console.error("润色 API 调用失败", error);
-        return text; // 如果 API 失败，则返回原始文本
+        return text; 
     }
 }
 
 async function button(text, i) {
-    return `<button class="button" id="${text}" onclick="change_text('msg-${counter}', '${text}');choose(${i})">${text}</button>`;
+    return `<button class="button" onclick="handleButtonClick(event, ${i})">${text}</button>`;
 }
-
-
+function handleButtonClick(event, i) {
+    const button = event.target;
+    const buttonText = button.textContent;
+    
+    const buttonContainer = button.closest('.message.user');
+    if (buttonContainer) {
+        buttonContainer.remove();
+    }
+    
+    add_user(buttonText);
+    
+    choose(i);
+}
 use_current_node();
