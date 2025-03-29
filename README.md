@@ -22,7 +22,7 @@ const openai = new OpenAI({
 });
 ```
 
-[**注意**]：本项目使用的是阿里云的 qwen-plus 模型，请去官网获取 api-key
+[**注意**]：本项目使用的是阿里云的 qwen-plus 模型，请去官网获取 [api-key](https://bailian.console.aliyun.com/?spm=5176.29597918.0.0.723f7ca0ytxEu8#/model-market/detail/qwen-max?tabKey=sdk) 。
 
 ## 4.启动服务器
 
