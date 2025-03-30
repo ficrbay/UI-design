@@ -35,16 +35,6 @@ function node(ai_text, choices, side_effects, children) {
     return {ai_text: ai_text, choices: choices, side_effects: side_effects, children: children};
 }
 let resource_node = node("如您希望获取有关心理健康的帮助，您可以在<a href='https://zhuanlan.zhihu.com/p/343113502'>这里</a>找到一些资源。<br>如您遇到了紧急情况，建议您", []);
-let quest_node = node("您此次咨询体验如何？是否有接受其他方面帮助的需求？", ["体验很好", "体验不好", "我想学习心理自助。", "我想找真人进行心理咨询。", "我想了解国内付费AI服务。", "能不能推荐一些国外的AI？"], [], [
-    node("感谢您的反馈。期待与您下次相遇。", []),
-    node("感谢您的反馈。我们会努力提高服务质量，期待与您下次相遇。", []),
-    node("您可以参考以下资源：<br><a class='button_link' href='https://book.douban.com/review/14087856/'>伯恩斯焦虑自助疗法</a><br><a class='button_link' href='https://www.bilibili.com/video/BV1mi4y1j7DF'>武志红心理学课程</a>", []),
-    resource_node,
-    node("为您推荐以下服务：<br><a class='button_link' href='https://www.whitexiaomao.com/#/home'>白小喵</a><br><a class='button_link' href='https://nawacares.com/zh'>小鸟心理</a> <br><a class='button_link' href='https://www.moodtalker.com/pc/#/'>林间聊愈室</a>", []),
-    node("为您推荐以下服务：<br><a class='button_link' href='https://chatgpt.com/'>ChatGPT</a><br><a class='button_link' href='https://talktoash.com/'>Ash</a><br>请您注意，这些服务可能在国内无法正常访问。", [])
-]);
-quest_node.children[2].children = quest_node.children[4].children = quest_node.children[5].children = [quest_node];
-let insuff_node = node("十分抱歉。本产品不具有专业医疗功能，因此对您的状况不能提供实质性帮助。", [], [], [resource_node]);
 let mobile = navigator.userAgent.match(/Mobi/i) || navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iPhone/i);
 if (mobile) {
     resource_node.ai_text += "点击下方按钮拨打希望24热线，及时寻求帮助。<br><a class=\"button_link\" href=\"tel:4001619995\">拨打电话</a>";
@@ -52,15 +42,32 @@ if (mobile) {
 else {
     resource_node.ai_text += "拨打希望24热线（400-161-9995）等危机干预热线，及时寻求帮助。";
 }
+let bk_insuff_node = node("十分抱歉，我们可能无法为您目前的情况提供合适的帮助，但我们仍可以为您提供帮助自己的渠道。我们首先强烈建议您前往医院寻求更专业的医疗服务，如您希望其他形式的专业帮助，也可以关注我们为您推荐的其他资源。", [], [], [resource_node]);
+let quest_node_2 = node("您认为此次服务给您的体验如何？", ["很好", "尚可", "一般", "较差", "很差"], [], [
+    node("感谢您的反馈。期待与您下次相遇。", []),
+    node("感谢您的反馈。期待与您下次相遇。", []),
+    node("感谢您的反馈。我们会努力提高服务质量，期待与您下次相遇。", []),
+    node("感谢您的反馈。我们会努力提高服务质量，期待与您下次相遇。", []),
+    node("感谢您的反馈。我们会努力提高服务质量，期待与您下次相遇。", []),
+]);
+let quest_node = node("您是否有接受其他形式帮助的需求？", ["我想学习心理自助。", "我想找真人进行心理咨询。", "我想了解国内付费AI服务。", "能不能推荐一些国外的AI？", "没有了"], [function(){}, function(){resource_node.children = [quest_node]}], [
+    node("您可以参考以下资源：<br><a class='button_link' href='https://book.douban.com/review/14087856/'>伯恩斯焦虑自助疗法</a><br><a class='button_link' href='https://www.bilibili.com/video/BV1mi4y1j7DF'>武志红心理学课程</a>", []),
+    resource_node,
+    node("为您推荐以下服务：<br><a class='button_link' href='https://www.whitexiaomao.com/#/home'>白小喵</a><br><a class='button_link' href='https://nawacares.com/zh'>小鸟心理</a> <br><a class='button_link' href='https://www.moodtalker.com/pc/#/'>林间聊愈室</a>", []),
+    node("为您推荐以下服务：<br><a class='button_link' href='https://chatgpt.com/'>ChatGPT</a><br><a class='button_link' href='https://talktoash.com/'>Ash</a><br>请您注意，这些服务可能在国内无法正常访问。", []),
+    quest_node_2
+]);
+quest_node.children[0].children = quest_node.children[2].children = quest_node.children[3].children = [quest_node];
+let insuff_node = node("十分抱歉。本产品不具有专业医疗功能，因此对您的状况不能提供实质性帮助。", [], [], [resource_node]);
 
 let score = 0;
-let l1_node = node('系统为您自动匹配最具胜任力的AI：<br><a class="button_link" href="https://www.ai-beings.com/#/home">聆心智能</a><br>您也可以尝试此视频的内容：<br><iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=302083972&bvid=BV19P411L7gX&cid=805648737&p=1&danmaku=0" scrolling="no" frameborder="no"></iframe>', ["还有其他视频吗？"], [], [node("<iframe src=\"https://player.bilibili.com/player.html?isOutside=true&aid=1256103509&bvid=BV1GJ4m1M7ar&cid=1617860853&p=1\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\" sandbox=\"allow-top-navigation allow-same-origin allow-forms allow-scripts\"></iframe>", [], [], [quest_node])]);
-let l2_node = node('系统为您自动匹配最具胜任力的AI：<br><a class="button_link" href="https://github.com/SmartFlowAI/EmoLLM">emoLLM</a><br>在此也推荐您阅读《自控力：和压力做朋友》（〔美〕凯利·麦格尼格尔 著）或尝试微信小程序Nephola。', [], [], [quest_node]);
-let l3_node = node('系统为您自动匹配最具胜任力的AI：Nephola<br>您可以在微信小程序中搜索到它。<br>您也可以参考此视频：<br><iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=634848676&bvid=BV1xb4y1q7uD&cid=458793856&p=1" scrolling="no" border="0" frameborder="no" allowfullscreen="true" sandbox="allow-top-navigation allow-same-origin allow-forms allow-scripts"></iframe>', [], [], [quest_node]);
-let med_node_next = node('系统为您自动匹配最有专业胜任力的AI：<br><a class="button_link" href="https://github.com/KarolynW/EmoGPT/blob/main/README.md">EmoGPT</a>', [], [], [quest_node])
-let low_node = node("感谢您完成量表填写！<br>结果显示您无抑郁。请问您希望咨询哪方面的问题？", ["我有些迷茫，想咨询未来规划。", "我最近压力比较大，想要陪伴和指导。", "我心情不太好，希望得到一些情感支持。", "我的问题比较复杂，想得到一些专业的帮助。"], [], [l1_node, l2_node, l3_node, med_node_next]);
-let med_node = node('感谢您完成量表填写！<br>结果显示您患有轻度抑郁。', [], [], [med_node_next]);
-let high_node = node("感谢您完成量表填写！<br>结果显示您患有中度至重度抑郁。", [], [], [node("建议您尽快寻求医疗帮助。", [], [], [insuff_node])])
+let l1_node = node('系统为您自动匹配最符合您需求的AI：<br><a class="button_link" href="https://www.ai-beings.com/#/home">聆心智能</a><br>您也可以尝试此视频的内容：<br><iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=302083972&bvid=BV19P411L7gX&cid=805648737&p=1&danmaku=0" scrolling="no" frameborder="no"></iframe>', ["还有其他视频吗？"], [], [node("<iframe src=\"https://player.bilibili.com/player.html?isOutside=true&aid=1256103509&bvid=BV1GJ4m1M7ar&cid=1617860853&p=1\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\" sandbox=\"allow-top-navigation allow-same-origin allow-forms allow-scripts\"></iframe>", [], [], [quest_node])]);
+let l2_node = node('系统为您自动匹配最符合您需求的AI：<br><a class="button_link" href="https://github.com/SmartFlowAI/EmoLLM">emoLLM</a><br>在此也推荐您阅读《自控力：和压力做朋友》（〔美〕凯利·麦格尼格尔 著）或尝试微信小程序Nephola。', [], [], [quest_node]);
+let l3_node = node('系统为您自动匹配最符合您需求的AI：Nephola<br>您可以在微信小程序中搜索到它。<br>您也可以参考此视频：<br><iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=634848676&bvid=BV1xb4y1q7uD&cid=458793856&p=1" scrolling="no" border="0" frameborder="no" allowfullscreen="true" sandbox="allow-top-navigation allow-same-origin allow-forms allow-scripts"></iframe>', [], [], [quest_node]);
+let med_node_next = node('系统为您自动匹配最符合您需求的AI：<br><a class="button_link" href="https://github.com/KarolynW/EmoGPT/blob/main/README.md">EmoGPT</a>', [], [], [quest_node])
+let low_node = node("感谢您的配合！<br>我们发现您的心理状态总体较健康。请问您希望咨询哪方面的问题？", ["我有些迷茫，想咨询未来规划。", "我最近压力比较大，想要陪伴和指导。", "我心情不太好，希望得到一些情感支持。", "我的问题比较复杂，想得到一些专业的帮助。"], [], [l1_node, l2_node, l3_node, med_node_next]);
+let med_node = node('感谢您的配合！<br>我们发现您可能存在一些轻度的抑郁情绪。', [], [], [med_node_next]);
+let high_node = node("感谢您的配合！<br>我们发现您可能存在中、重度等较为严重的心理问题。", [], [], [bk_insuff_node])
 let scale_nodes = [];
 function set_scale_exit() {
     let scale_node_exit;
@@ -87,9 +94,9 @@ function scale_node(i) {
 for (let i = 0; i < 21; ++i) {  
     scale_nodes.push(scale_node(i + 1));
 }
-scale_nodes[0].ai_text = "为更好地向您提供服务，请您跟随我进行贝克抑郁量表的填写流程。<br>" + scale_nodes[0].ai_text;
+scale_nodes[0].ai_text = "为了向您提供最符合您需求的服务，我会问您一些有关于您日常生活的小问题，您按照自己的真实情况如实作答即可。<br>" + scale_nodes[0].ai_text;
 
-let root_node = node("您好！在开始之前，请您知晓：本项目仅为您推荐匹配来访需要的AI，不会获取您的任何隐私信息，具体的隐私政策请关注AI服务实际提供方。<br>您是否同意接受本项目提供的服务？", ["我同意", "我不同意"]);
+let root_node = node("您好！在开始之前，请您知晓：本项目仅为您推荐最符合您的需要的AI，不会获取您的任何隐私信息，具体的隐私政策请关注AI服务实际提供方。<br>您是否同意接受本项目提供的服务？", ["我同意", "我不同意"]);
 let node1 = node("感谢您的支持。<br>您在过去2年内是否有心理疾病的医院诊断？", ["有", "没有"]);
 let node2 = node("感谢您的反馈。", []);
 
