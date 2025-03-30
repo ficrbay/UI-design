@@ -54,9 +54,9 @@ else {
 }
 
 let score = 0;
-let l1_node = node('系统为您自动匹配最具胜任力的AI：<br><a class="button_link" href="https://www.ai-beings.com/#/home">聆心智能</a><br>您也可以尝试此视频的内容：<br><iframe src="//player.bilibili.com/player.html?isOutside=true&aid=302083972&bvid=BV19P411L7gX&cid=805648737&p=1&danmaku=0" scrolling="no" frameborder="no"></iframe>', ["还有其他视频吗？"], [], [node("<iframe src=\"//player.bilibili.com/player.html?isOutside=true&aid=1256103509&bvid=BV1GJ4m1M7ar&cid=1617860853&p=1\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\" sandbox=\"allow-top-navigation allow-same-origin allow-forms allow-scripts\"></iframe>", [], [], [quest_node])]);
+let l1_node = node('系统为您自动匹配最具胜任力的AI：<br><a class="button_link" href="https://www.ai-beings.com/#/home">聆心智能</a><br>您也可以尝试此视频的内容：<br><iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=302083972&bvid=BV19P411L7gX&cid=805648737&p=1&danmaku=0" scrolling="no" frameborder="no"></iframe>', ["还有其他视频吗？"], [], [node("<iframe src=\"https://player.bilibili.com/player.html?isOutside=true&aid=1256103509&bvid=BV1GJ4m1M7ar&cid=1617860853&p=1\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\" sandbox=\"allow-top-navigation allow-same-origin allow-forms allow-scripts\"></iframe>", [], [], [quest_node])]);
 let l2_node = node('系统为您自动匹配最具胜任力的AI：<br><a class="button_link" href="https://github.com/SmartFlowAI/EmoLLM">emoLLM</a><br>在此也推荐您阅读《自控力：和压力做朋友》（〔美〕凯利·麦格尼格尔 著）或尝试微信小程序Nephola。', [], [], [quest_node]);
-let l3_node = node('系统为您自动匹配最具胜任力的AI：Nephola<br>您可以在微信小程序中搜索到它。<br>您也可以参考此视频：<br><iframe src="//player.bilibili.com/player.html?isOutside=true&aid=634848676&bvid=BV1xb4y1q7uD&cid=458793856&p=1" scrolling="no" border="0" frameborder="no" allowfullscreen="true" sandbox="allow-top-navigation allow-same-origin allow-forms allow-scripts"></iframe>', [], [], [quest_node]);
+let l3_node = node('系统为您自动匹配最具胜任力的AI：Nephola<br>您可以在微信小程序中搜索到它。<br>您也可以参考此视频：<br><iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=634848676&bvid=BV1xb4y1q7uD&cid=458793856&p=1" scrolling="no" border="0" frameborder="no" allowfullscreen="true" sandbox="allow-top-navigation allow-same-origin allow-forms allow-scripts"></iframe>', [], [], [quest_node]);
 let med_node_next = node('系统为您自动匹配最有专业胜任力的AI：<br><a class="button_link" href="https://github.com/KarolynW/EmoGPT/blob/main/README.md">EmoGPT</a>', [], [], [quest_node])
 let low_node = node("感谢您完成量表填写！<br>结果显示您无抑郁。请问您希望咨询哪方面的问题？", ["我有些迷茫，想咨询未来规划。", "我最近压力比较大，想要陪伴和指导。", "我心情不太好，希望得到一些情感支持。", "我的问题比较复杂，想得到一些专业的帮助。"], [], [l1_node, l2_node, l3_node, med_node_next]);
 let med_node = node('感谢您完成量表填写！<br>结果显示您患有轻度抑郁。', [], [], [med_node_next]);
@@ -125,16 +125,17 @@ async function use_current_node() {
         `;
         document.querySelector('.container').appendChild(button_container);
     }
+    return true;
 }
-function choose(i) {
+async function choose(i) {
     if (current_node.side_effects[i] !== undefined) {
         current_node.side_effects[i]();
     }
     current_node = current_node.children[i];
-    use_current_node();
+    await use_current_node();
     while (current_node.choices.length === 0 && current_node.children !== undefined) {
         current_node = current_node.children[0];
-        use_current_node();
+        await use_current_node();
     }
 }
 async function enhanceText(text) {
