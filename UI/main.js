@@ -1,5 +1,3 @@
-import { text } from "express";
-
 let counter = 0;
 function change_text(id, text) {
   let element = document.getElementById(id);
@@ -455,16 +453,18 @@ async function enhanceText(text) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        text: text,
+        text, // 后端会当作 "user" 角色的内容
         system_prompt:
           "请将用户的语句润色，使其更加精美，同时保留原有的 HTML 标签，并可适当添加 HTML 标签以优化样式。但不要使用 <p> 标签，确保语法无误，仅输出优化后的句子，不要添加额外内容。",
       }),
     });
 
     const data = await response.json();
+    // 后端返回 { response: "..." }
     return data.response;
   } catch (error) {
     console.error("润色 API 调用失败", error);
+    // 出错时依旧返回原文本（或返回一个字符串提示）
     return text;
   }
 }
@@ -475,12 +475,13 @@ async function chat(text_user) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        text: text_user,
+        text: text_user, // 后端会当作 "user" 角色的内容
         system_prompt: "你是一个AI智能咨询师,要帮我解答一些心理问题",
       }),
     });
 
     const data = await response.json();
+    // 同样这里后端返回 { response: "..." }
     return data.response;
   } catch (error) {
     console.error("AI 聊天接口调用失败", error);
