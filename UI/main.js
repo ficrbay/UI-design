@@ -34,6 +34,12 @@ function node(ai_text, choices, side_effects, children) {
     }
     return {ai_text: ai_text, choices: choices, side_effects: side_effects, children: children};
 }
+
+function add_chat_pair(ai_text) {
+    add_ai(ai_text);
+    let user_content = "<form id='text_form'><label for='user_text'></label><input type='text' id='user_text' name='user_text'></form><button onclick='handleButtonClickChat(event)'>提交</button>"
+    add_user(user_content);
+}
 let resource_node = node("如您希望获取有关心理健康的帮助，您可以在<a href='https://zhuanlan.zhihu.com/p/343113502'>这里</a>找到一些资源。<br>如您遇到了紧急情况，建议您", []);
 let mobile = navigator.userAgent.match(/Mobi/i) || navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iPhone/i);
 if (mobile) {
@@ -43,12 +49,14 @@ else {
     resource_node.ai_text += "拨打希望24热线（400-161-9995）等危机干预热线，及时寻求帮助。";
 }
 let bk_insuff_node = node("十分抱歉，我们可能无法为您目前的情况提供合适的帮助，但我们仍可以为您提供帮助自己的渠道。我们首先强烈建议您前往医院寻求更专业的医疗服务，如您希望其他形式的专业帮助，也可以关注我们为您推荐的其他资源。", [], [], [resource_node]);
+let node_bye = node("期待与您下次相遇。", []);
+let node_input_start = node("感谢您的反馈。您是否需要咨询其他问题？", ["是", "否"], [function (){add_chat_pair("请问您有什么问题？")}], [undefined, node_bye]);
 let quest_node_2 = node("您认为此次服务给您的体验如何？", ["很好", "尚可", "一般", "较差", "很差"], [], [
-    node("感谢您的反馈。期待与您下次相遇。", []),
-    node("感谢您的反馈。期待与您下次相遇。", []),
-    node("感谢您的反馈。我们会努力提高服务质量，期待与您下次相遇。", []),
-    node("感谢您的反馈。我们会努力提高服务质量，期待与您下次相遇。", []),
-    node("感谢您的反馈。我们会努力提高服务质量，期待与您下次相遇。", []),
+    node_input_start,
+    node_input_start,
+    node_input_start,
+    node_input_start,
+    node_input_start
 ]);
 let quest_node = node("您是否有接受其他形式帮助的需求？", ["我想学习心理自助。", "我想找真人进行心理咨询。", "我想了解国内付费AI服务。", "能不能推荐一些国外的AI？", "没有了"], [function(){}, function(){resource_node.children = [quest_node]}], [
     node("您可以参考以下资源：<br><a class='button_link' href='https://book.douban.com/review/14087856/'>伯恩斯焦虑自助疗法</a><br><a class='button_link' href='https://www.bilibili.com/video/BV1mi4y1j7DF'>武志红心理学课程</a>", []),
@@ -138,7 +146,11 @@ async function choose(i) {
     if (current_node.side_effects[i] !== undefined) {
         current_node.side_effects[i]();
     }
-    current_node = current_node.children[i];
+    const child = current_node.children[i];
+    if (child === undefined) {
+        return;
+    }
+    current_node = child;
     await use_current_node();
     while (current_node.choices.length === 0 && current_node.children !== undefined) {
         current_node = current_node.children[0];
@@ -160,6 +172,9 @@ async function enhanceText(text) {
         return text; 
     }
 }
+async function chat(text_user) {
+    return "【敬请期待】";
+}
 
 async function button(text, i) {
     return `<button class="button" onclick="handleButtonClick(event, ${i})">${text}</button>`;
@@ -176,5 +191,20 @@ function handleButtonClick(event, i) {
     add_user(buttonText);
     
     choose(i);
+}
+async function handleButtonClickChat(event) {
+    const button = event.target;
+    const buttonText = document.forms["text_form"]["user_text"].value;
+    if (buttonText == null || buttonText === "") {
+        alert("不能提交空值");
+        return;
+    }
+    const buttonContainer = button.closest('.message.user');
+    if (buttonContainer) {
+        buttonContainer.remove();
+    }
+    add_user(buttonText);
+    const ai_text = await chat(buttonText);
+    add_chat_pair(ai_text);
 }
 use_current_node();
