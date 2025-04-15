@@ -25,7 +25,7 @@ app.post("/api/chat", async (req, res) => {
         const completion = await openai.chat.completions.create({
             model: "qwen-plus",
             messages: [
-                { role: "system", content: "你要做的是把我所有的语句说的更加精美一些，不要落下话语里面的HTML标签，可以适当加一些html标签使得对话的样式更好看，不要加<p>标签，千万不要出现语法错误，不要说出其他话语，只输出简短的句子" },
+                { role: "system", content: "请将我的所有语句润色，使其更加精美，同时保留原有的 HTML 标签，并可适当添加 HTML 标签以优化样式。但不要使用 <p> 标签，确保语法无误，仅输出优化后的句子，不要添加额外内容。" },
                 { role: "user", content: text }
             ],
         });
