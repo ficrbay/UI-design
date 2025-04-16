@@ -12,7 +12,7 @@ function add_ai(content) {
   let msg = document.createElement("div");
   msg.className = "message ai";
   msg.innerHTML = `
-        <img src="https://scp-wiki.wdfiles.com/local--files/scp-3021/a.png" alt="AI Icon">
+        <img src="1.jpg" alt="AI Icon">
         <div class="message-content" id = "msg-${counter}">${content}</div>
     `;
   document.querySelector(".container").appendChild(msg);
@@ -23,7 +23,7 @@ function add_user(content) {
   msg.className = "message user";
   msg.innerHTML = `
         <div class="message-content" id = "msg-${counter}">${content}</div>
-        <img src="https://scp-wiki.wdfiles.com/local--files/scp-3021/b.png" alt="User Icon">
+        <img src="2.jpg" alt="User Icon">
     `;
   document.querySelector(".container").appendChild(msg);
 }
@@ -423,7 +423,7 @@ async function use_current_node() {
     button_container.className = "message user";
     button_container.innerHTML = `
             <div class="message-content" id="buttons-${counter}">${user_content}</div>
-            <img src="https://scp-wiki.wdfiles.com/local--files/scp-3021/b.png" alt="User Icon">
+            <img src="2.jpg" alt="User Icon">
         `;
     document.querySelector(".container").appendChild(button_container);
   }
